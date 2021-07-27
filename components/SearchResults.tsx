@@ -1,27 +1,26 @@
-import { useMemo } from "react"
+import { List, ListRowRenderer } from 'react-virtualized'
 import { ProductItem } from "./ProductItem"
 
 interface SearchResultsProps {
-    results: Array<{ id: number, price: number, title: string }>
+    totalPrice: number;
+    results: Array<{ id: number, price: number, priceFormatted: string, title: string }>
     onAddToWishList: (id: number) => void
 }
 
 
-export function SearchResults({ results, onAddToWishList }: SearchResultsProps) {
-    const totalPrice = useMemo(() => {
-        return results.reduce((total, product) => {
-            return total + product.price
-        }, 0)
-    }, [results])
-
+export function SearchResults({ results, onAddToWishList, totalPrice }: SearchResultsProps) {
+    const rowRenderer: ListRowRenderer = ({ index, key, style }) => {
+        return (
+            <div key={key} style={style}>
+                <ProductItem product={results[index]} onAddToWishList={onAddToWishList} />
+            </div>
+        )
+    }
     return (
         <div>
             <h2>{totalPrice}</h2>
-            {results.map(product => {
-                return (
-                    <ProductItem key={product.id} product={product} onAddToWishList={onAddToWishList} />
-                )
-            })}
+
+            <List height={300} rowHeight={30} width={900} overscanRowCount={5} rowCount={results.length} rowRenderer={rowRenderer} />
         </div>
     )
 }
@@ -31,5 +30,5 @@ export function SearchResults({ results, onAddToWishList }: SearchResultsProps) 
 useMemo/usecallBack
 1. Calculos pesados
 2. Igualdadade referencial (quando a gente repassa aquela informação a um componente filho)
-3. 
+3.
 */
